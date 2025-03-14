@@ -1,6 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const sequelize = require("./config/database"); // Import Sequelize instance
 
 dotenv.config();
 
@@ -20,4 +21,11 @@ app.use("/accounts", accountRoutes);
 app.use("/transactions", transactionRoutes);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// Sync database and start server
+sequelize.sync({ alter: true }) // Ensures tables exist and updates structure if needed
+  .then(() => {
+    console.log("✅ Database synced successfully");
+    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+  })
+  .catch(err => console.error("❌ Database sync error:", err));
