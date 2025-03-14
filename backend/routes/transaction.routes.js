@@ -1,18 +1,20 @@
 const express = require("express");
-const { authenticate } = require("../middlewares/auth.middleware");
-const { Account, Transaction } = require("../models");
+const { Transaction, Account } = require("../models");
+const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-router.post("/deposit", authenticate, async (req, res) => {
-  const { amount } = req.body;
-  const account = await Account.findOne({ where: { userId: req.user.id } });
+// Get Transaction History
+router.get("/history", authMiddleware, async (req, res) => {
+  try {
+    const accounts = await Account.findAll({ where: { userId: req.user.id } });
+    const accountIds = accounts.map(acc => acc.id);
 
-  account.balance += amount;
-  await account.save();
-
-  await Transaction.create({ accountId: account.id, type: "deposit", amount });
-  res.json(account);
+    const transactions = await Transaction.findAll({ where: { accountId: accountIds } });
+    res.json(transactions);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 module.exports = router;
