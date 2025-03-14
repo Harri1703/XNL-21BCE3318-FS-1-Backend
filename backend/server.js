@@ -1,19 +1,23 @@
-require("dotenv").config();
 const express = require("express");
+const dotenv = require("dotenv");
 const cors = require("cors");
-const { sequelize } = require("./models");
+
+dotenv.config();
 
 const app = express();
-app.use(cors());
 app.use(express.json());
+app.use(cors());
 
-app.use("/auth", require("./routes/auth.routes"));
-app.use("/accounts", require("./routes/account.routes"));
-app.use("/transactions", require("./routes/transaction.routes"));
-app.use("/users", require("./routes/user.routes"));
+// Import Routes
+const authRoutes = require("./routes/auth.routes");
+const userRoutes = require("./routes/user.routes");
+const accountRoutes = require("./routes/account.routes");
+const transactionRoutes = require("./routes/transaction.routes");
 
-sequelize.sync().then(() => {
-  app.listen(process.env.PORT || 5000, () => {
-    console.log("Server running...");
-  });
-});
+app.use("/auth", authRoutes);
+app.use("/users", userRoutes);
+app.use("/accounts", accountRoutes);
+app.use("/transactions", transactionRoutes);
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
