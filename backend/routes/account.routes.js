@@ -1,6 +1,6 @@
 const express = require("express");
 const { Account, Transaction } = require("../models");
-const authMiddleware = require("../middleware/authMiddleware");
+const authMiddleware = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
